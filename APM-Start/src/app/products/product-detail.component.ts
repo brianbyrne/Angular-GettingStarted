@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IProduct } from './product';
+import { ProductService } from './product.service';
 
 @Component({
   selector: 'pm-product-detail',
@@ -9,7 +10,8 @@ import { IProduct } from './product';
 })
 export class ProductDetailComponent implements OnInit {
   product: IProduct | undefined;
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  
+  constructor(private route: ActivatedRoute, private router: Router, private productService: ProductService) {}
 
   pageTitle: string = 'Product Details';
 
@@ -17,17 +19,16 @@ export class ProductDetailComponent implements OnInit {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.pageTitle += `: ${id}`;
 
-    // TODO remove hard coded product:
-    this.product = {
-      'productId': id,
-      'productName': 'Blah',
-      'productCode': '010202',
-      'releaseDate': 'March 19, 2021',
-      'description': 'Leaf Rake',
-      'price': 19.95,
-      'starRating': 3.2,
-      'imageUrl': 'assets/images/leaf_rake.png'
-    };
+    if(id){
+      this.getProduct(id);
+    }
+  }
+
+  getProduct(id: number): void {
+    this.productService.getProduct(id).subscribe({
+      next: product => this.product = product
+      //error: error => this.errorMessage = error;
+    });
   }
 
   onBack(): void {
